@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@chainlink/contracts": "1.1.0",
+    "@noble/hashes": "^2.2.0",
+    "@privy-io/server-auth": "^1.32.5",
     "ethers": "^6.13.0",
     "merkletreejs": "^0.4.0",
     "viem": "^2.21.0"

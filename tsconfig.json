@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@noble/hashes/crypto": [
+        "node_modules/@noble/hashes/crypto.js",
+        "node_modules/@privy-io/server-auth/node_modules/@noble/hashes/crypto.js"
+      ]
+    }
+  }
+}

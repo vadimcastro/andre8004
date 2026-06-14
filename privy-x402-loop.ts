@@ -1,7 +1,6 @@
 import { Database } from "bun:sqlite";
 import { keccak256, encodePacked, verifyTypedData } from "viem";
 import { join } from "path";
-import { PrivyClient } from "./privy-mock";
 
 const DB_FILE = process.env.DATABASE_FILE || join(import.meta.dir, "andre8004_cache.db");
 
@@ -33,8 +32,26 @@ async function runExecutionLoop() {
   const appId = process.env.PRIVY_APP_ID || "mock-app-id";
   const appSecret = process.env.PRIVY_APP_SECRET || "mock-app-secret";
 
-  console.log(`Initializing Privy client (App ID: ${appId})...`);
-  const privy = new PrivyClient(appId, appSecret);
+  let privy: any;
+  if (process.env.USE_REAL_PRIVY === "true") {
+    console.log(`Initializing REAL Privy client (App ID: ${appId})...`);
+    try {
+      const privyParts = ["@privy-io", "server-auth"];
+      const privyPkg = privyParts.join("/");
+      const { PrivyClient } = await import(privyPkg);
+      privy = new PrivyClient(appId, appSecret);
+    } catch (err: any) {
+      console.warn("⚠️ Failed to load real Privy SDK. Falling back to mock Privy client.", err.message || err);
+      const mockPkg = "./privy-mock";
+      const { PrivyClient: MockClient } = await import(mockPkg);
+      privy = new MockClient(appId, appSecret);
+    }
+  } else {
+    console.log(`Initializing Mock Privy client (App ID: ${appId})...`);
+    const mockPkg = "./privy-mock";
+    const { PrivyClient: MockClient } = await import(mockPkg);
+    privy = new MockClient(appId, appSecret);
+  }
 
   // 1. Provision / Retrieve Agent's Privy Server Wallet
   const clientWallet = await privy.walletApi.ethereum.create();
