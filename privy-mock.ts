@@ -1,8 +1,8 @@
-import { privateKeyToAccount } from "viem/accounts";
+import { KmsWallet } from "./kms-signer";
 
 /**
  * Mock implementation of @privy-io/server-auth for testing and hackathon setup.
- * Uses viem's privateKeyToAccount underneath to generate real, verifiable cryptographic signatures.
+ * Integrates with KmsWallet underneath to support key management simulation.
  */
 export class PrivyClient {
   appId: string;
@@ -19,14 +19,9 @@ export class PrivyClient {
     this.appId = appId;
     this.appSecret = appSecret;
 
-    // Retrieve private key from dotenv setup (created via .env script)
-    const envKey = process.env.DEPLOYER_PRIVATE_KEY;
-    const privateKey = envKey && envKey.startsWith("0x") ? (envKey as `0x${string}`) : undefined;
-    
-    // Fallback to standard local development key if environment variable is not defined
-    const account = privateKey 
-      ? privateKeyToAccount(privateKey)
-      : privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
+    // Retrieve custom KMS wallet instance
+    const kmsWallet = new KmsWallet({});
+    const account = kmsWallet.toViemAccount();
 
     this.walletApi = {
       ethereum: {
@@ -42,7 +37,7 @@ export class PrivyClient {
             throw new Error(`Address ${params.address} is not managed by this Privy client instance.`);
           }
           
-          // Construct EIP-712 structured hash and sign it using viem
+          // Sign EIP-712 structured hash via the KMS Wallet Account interface
           const { domain, types, message, primaryType } = params.typedData;
           const signature = await account.signTypedData({
             domain,
