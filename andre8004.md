@@ -77,9 +77,11 @@
   Securely store Privy App IDs, Secrets, and the Agent's EVM private keys using AWS KMS, GCP Secret Manager, or HashiCorp Vault instead of local `.env` files.
 * **[TODO] Task 6.2 (High Impact - Decentralization): Chainlink Functions DON Integration**
   Deploy and configure the Chainlink Functions decentralized oracle network script. Point the contract `andre8004.sol` to fetch roots programmatically from the edge cached server URL rather than manually invoking `manualUpdateRoot`.
-* **[TODO] Task 6.3 (Medium Impact - Reliability): Supervisor Background Event Listener**
-  Wrap `arc-streamer.ts` in a Docker container controlled by PM2 or run on AWS ECS Fargate, configuring automated RPC failure reconnect loops and logging alarms.
+* **[COMPLETE] Task 6.3 (Medium Impact - Reliability): Supervisor Background Event Listener**
+  Wrap `arc-streamer.ts` and `server.ts` in a Docker container using Docker Compose with shared SQLite volumes and automated RPC failure reconnect retry loops.
 * **[TODO] Task 6.4 (Medium Impact - Performance): High-Availability Edge Cache Proof API**
   Deploy the Bun server `server.ts` on Vercel or AWS, placing the proof routes (`/agents/:address/proof`) behind a Cloudflare CDN cache to ensure sub-10ms global proof retrieval.
 * **[TODO] Task 6.5 (Low Impact - Scalability): Cache Database Migration**
   Migrate the local SQLite analytical DB to AWS RDS Postgres or a Supabase cluster. *Note: SQLite handles local reads/writes in WAL mode in sub-milliseconds and is sufficient for single-instance setups, so this is prioritized lowest.*
+* **[TODO] Task 6.6 (High Impact - Testing Flow): On-Chain Root Committer Script**
+  Write a script `commit-root.ts` that queries the current Merkle root from the database cache and updates the deployed `andre8004.sol` contract directly on-chain using the owner's deployer wallet. This bridges the Merkle factory to the live contract for instant testing before Chainlink Functions setup is completed.
