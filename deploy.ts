@@ -1,4 +1,4 @@
-import { createPublicClient, createWalletClient, http } from "viem";
+import { createPublicClient, createWalletClient, http, getAddress } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
@@ -34,7 +34,7 @@ async function main() {
   console.log(`Deployer address: ${account.address}`);
 
   // Configurable Chainlink parameters (Base Sepolia defaults)
-  const routerAddress = (process.env.FUNCTIONS_ROUTER || "0xCaaE779e0Ce4544ecB63ba0F1530E30489956b62") as `0x${string}`;
+  const routerAddress = getAddress(process.env.FUNCTIONS_ROUTER || "0xCaaE779e0Ce4544ecB63ba0F1530E30489956b62");
   
   // DON ID for Base Sepolia (fun-base-sepolia-1) encoded in bytes32
   const donId = (process.env.FUNCTIONS_DON_ID || "0x66756e2d626173652d7365706f6c69612d310000000000000000000000000000") as `0x${string}`;

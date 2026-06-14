@@ -1,0 +1,11 @@
+{
+  "contract_name": "andre8004",
+  "deployed_address": "0x76236322b4c099b7ab35da2961d41a72d329a25a",
+  "transaction_hash": "0x484a24c60a4a3d2c2811fdfad0300c284bf2b7322bdab39a235e544fc7d8e627",
+  "block_number": "47022183",
+  "gas_used": "1479016",
+  "timestamp": "2026-06-14T11:05:54.065Z",
+  "network_rpc": "https://rpc.testnet.arc.network",
+  "router_address": "0xCaAe779E0cE4544Ecb63BA0f1530e30489956B62",
+  "don_id": "0x66756e2d626173652d7365706f6c69612d310000000000000000000000000000"
+}
