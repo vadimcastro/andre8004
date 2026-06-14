@@ -2,7 +2,7 @@ import { Database } from "bun:sqlite";
 import { keccak256, encodePacked } from "viem";
 import { join } from "path";
 
-const DB_FILE = join(import.meta.dir, "andre8004_cache.db");
+const DB_FILE = process.env.DATABASE_FILE || join(import.meta.dir, "andre8004_cache.db");
 
 // Reconstruct verification matching andre8004.sol logic
 function verifyProof(proof: string[], root: string, leaf: string): boolean {

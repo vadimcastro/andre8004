@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # 1. API Server & Silver-Blue Dashboard
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: andre8004-server
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - ARC_REPUTATION_REGISTRY=0x8004a169fb4a3325136eb29fa0ceb6d2e539a432
+      - DATABASE_FILE=/app/db-volume/andre8004_cache.db
+    volumes:
+      - db-data:/app/db-volume
+    env_file:
+      - .env
+    command: bun server.ts
+    restart: unless-stopped
+
+  # 2. Live Arc L1 Event Streamer (Ingestion Daemon)
+  streamer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: andre8004-streamer
+    environment:
+      - ARC_REPUTATION_REGISTRY=0x8004a169fb4a3325136eb29fa0ceb6d2e539a432
+      - DATABASE_FILE=/app/db-volume/andre8004_cache.db
+    volumes:
+      - db-data:/app/db-volume
+    env_file:
+      - .env
+    command: bun arc-streamer.ts
+    restart: unless-stopped
+    depends_on:
+      - server
+
+volumes:
+  db-data:
+    driver: local

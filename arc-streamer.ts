@@ -8,7 +8,7 @@ const ARC_CHAIN_ID = 5042002;
 // Default registry address for agent reputation on Arc
 const REGISTRY_ADDRESS = (process.env.ARC_REPUTATION_REGISTRY || "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432") as `0x${string}`;
 
-const DB_FILE = join(import.meta.dir, "andre8004_cache.db");
+const DB_FILE = process.env.DATABASE_FILE || join(import.meta.dir, "andre8004_cache.db");
 
 const abi = [
   {

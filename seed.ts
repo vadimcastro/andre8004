@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 
 const SEED_FILE = join(import.meta.dir, "feedbacks_seed.jsonl");
-const DB_FILE = join(import.meta.dir, "andre8004_cache.db");
+const DB_FILE = process.env.DATABASE_FILE || join(import.meta.dir, "andre8004_cache.db");
 
 function main() {
   console.log(`Starting SQLite seeder...`);

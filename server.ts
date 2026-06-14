@@ -2,7 +2,7 @@ import { Database } from "bun:sqlite";
 import { join } from "path";
 
 const PORT = process.env.PORT || 3000;
-const DB_FILE = join(import.meta.dir, "andre8004_cache.db");
+const DB_FILE = process.env.DATABASE_FILE || join(import.meta.dir, "andre8004_cache.db");
 const HTML_FILE = join(import.meta.dir, "index.html");
 
 const db = new Database(DB_FILE);

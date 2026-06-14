@@ -2,7 +2,7 @@ import { Database } from "bun:sqlite";
 import { join } from "path";
 import { readFileSync, existsSync } from "fs";
 
-const DB_FILE = join(import.meta.dir, "andre8004_cache.db");
+const DB_FILE = process.env.DATABASE_FILE || join(import.meta.dir, "andre8004_cache.db");
 const AGENTS_JSON_FILE = "/Users/vadim/.gemini/antigravity-ide/scratch/all_402_agents.json";
 
 interface RawFeedback {

@@ -3,7 +3,7 @@ import { MerkleTree } from "merkletreejs";
 import { Database } from "bun:sqlite";
 import { join } from "path";
 
-const DB_FILE = join(import.meta.dir, "andre8004_cache.db");
+const DB_FILE = process.env.DATABASE_FILE || join(import.meta.dir, "andre8004_cache.db");
 
 interface CachedAgent {
   agent_guid: string;

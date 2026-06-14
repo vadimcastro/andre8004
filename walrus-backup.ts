@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
 import { join } from "path";
 
-const DB_FILE = join(import.meta.dir, "andre8004_cache.db");
+const DB_FILE = process.env.DATABASE_FILE || join(import.meta.dir, "andre8004_cache.db");
 const WALRUS_PUBLISHER_URL = "https://publisher.walrus-testnet.walrus.space/store";
 
 interface CachedAgent {
