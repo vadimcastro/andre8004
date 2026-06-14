@@ -17,7 +17,7 @@ services:
       - db-data:/app/db-volume
     env_file:
       - .env
-    command: bun server.ts
+    command: sh -c "bun bootstrap.ts && bun server.ts"
     restart: unless-stopped
 
   # 2. Live Arc L1 Event Streamer (Ingestion Daemon)
