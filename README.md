@@ -2,6 +2,12 @@
 
 `andre8004` is a high-performance reputation routing and trust verification engine for AI Agents built on top of the **ERC-8004 reputation standard** and the **ERC-402 payment lifecycle**. It provides off-chain consensus caching, Sybil-slashing calculations, and on-chain cryptographic state root verification for autonomous agentic networks.
 
+> [!IMPORTANT]
+> **Circle Arc Testnet Live Deployments:**
+> * **Oracle Contract Address:** [`0x76236322b4c099b7ab35da2961d41a72d329a25a`](https://testnet.arcscan.app/address/0x76236322b4c099b7ab35da2961d41a72d329a25a)
+> * **Signer Deployer Address:** `0x413c6e2F811cbDe4A534d655dd09B66162F2286c`
+> * **Epoch 1 On-Chain Root Commit:** Tx Hash [`0xf682cdc254cc2811492835702207f8ae9b87ed5d558d0ea9f8eb81605dc3206a`](https://testnet.arcscan.app/tx/0xf682cdc254cc2811492835702207f8ae9b87ed5d558d0ea9f8eb81605dc3206a)
+
 ---
 
 ## 🏗️ System Architecture
