@@ -69,12 +69,17 @@
 
 ---
 
-## **Phase 6: Production Deployment Blueprint (Stretch Goal)**
+## **Phase 6: Production Deployment Roadmap (Prioritized by Impact/Value)**
 
-**Goal:** Transition the engine from local scripts to a resilient, containerized cloud infrastructure.
+**Goal:** Transition the reputation engine from a local mock setup to a highly secure, reliable, and production-ready cloud deployment.
 
-* **[TODO] Task 6.1 (Database Migration):** Migrate the analytical cache SQLite db to an AWS RDS Postgres or Supabase cluster.
-* **[TODO] Task 6.2 (Supervisor Event Listener):** Wrap `arc-streamer.ts` in a Docker container run by PM2 or AWS ECS with automated RPC reconnect loops.
-* **[TODO] Task 6.3 (High-Availability Proof API):** Expose `server.ts` behind Cloudflare CDN edge caching for fast proof retrievals (`/agents/:address/proof`).
-* **[TODO] Task 6.4 (Serverless Proof Cron):** Set up AWS Lambda or Google Cloud Scheduler to trigger `merkle.ts` proof factory calculations at the end of each epoch.
-* **[TODO] Task 6.5 (KMS Key Management):** Store Privy server secret keys and wallet parameters securely in AWS KMS or GCP Secret Manager.
+* **[TODO] Task 6.1 (High Impact - Security): KMS Key Management & Privy Credentials**
+  Securely store Privy App IDs, Secrets, and the Agent's EVM private keys using AWS KMS, GCP Secret Manager, or HashiCorp Vault instead of local `.env` files.
+* **[TODO] Task 6.2 (High Impact - Decentralization): Chainlink Functions DON Integration**
+  Deploy and configure the Chainlink Functions decentralized oracle network script. Point the contract `andre8004.sol` to fetch roots programmatically from the edge cached server URL rather than manually invoking `manualUpdateRoot`.
+* **[TODO] Task 6.3 (Medium Impact - Reliability): Supervisor Background Event Listener**
+  Wrap `arc-streamer.ts` in a Docker container controlled by PM2 or run on AWS ECS Fargate, configuring automated RPC failure reconnect loops and logging alarms.
+* **[TODO] Task 6.4 (Medium Impact - Performance): High-Availability Edge Cache Proof API**
+  Deploy the Bun server `server.ts` on Vercel or AWS, placing the proof routes (`/agents/:address/proof`) behind a Cloudflare CDN cache to ensure sub-10ms global proof retrieval.
+* **[TODO] Task 6.5 (Low Impact - Scalability): Cache Database Migration**
+  Migrate the local SQLite analytical DB to AWS RDS Postgres or a Supabase cluster. *Note: SQLite handles local reads/writes in WAL mode in sub-milliseconds and is sufficient for single-instance setups, so this is prioritized lowest.*
