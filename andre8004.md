@@ -51,13 +51,13 @@
 * **[COMPLETE] Task 3.2 (The Verification Method):** Implement `verifyAgent(uint256 epochId, address targetAgent, int256 score, bool x402Capable, bytes32[] calldata proof)`. The method validates the proof against the historical root matching `epochId`.
 * **[COMPLETE] Task 3.3 (Contract Verification Simulation):** Author `test-oracle.ts` simulating Solidity verification logic locally. Fully verify valid proofs, tampered scores, and altered proof paths against the 1,915-element Merkle root in the database.
 
-## **Phase 4: Privy Integration & x402 Execution Loop (Priority: Medium) — [IN PROGRESS]**
+## **Phase 4: Privy Integration & x402 Execution Loop (Priority: Medium) — [COMPLETE]**
 
 **Goal:** Harness automated agent wallets to run production loops leveraging the oracle and HTTP payments.
 
-* **[IN PROGRESS] Task 4.1 (Privy Agent Setup):** Configure server-managed, programmatically controlled wallet environments using `@privy-io/server-auth`.
+* **[COMPLETE] Task 4.1 (Privy Agent Setup):** Configure server-managed, programmatically controlled wallet environments using `@privy-io/server-auth` (mocked for development, fully modular for credentials upgrade).
 * **[COMPLETE] Task 4.2 (Oracle Consultation):** Program the client agent to request a task, check the target agent's proof, and verify reputation status before initiating payment.
-* **[IN PROGRESS] Task 4.3 (P2P x402 Settlement):** Implement the ERC-3009 payment lifecycle off-chain, signing `ReceiveWithAuthorization` payloads and sending them via `X-PAYMENT` headers to settled targets.
+* **[COMPLETE] Task 4.3 (P2P x402 Settlement):** Implement the ERC-3009 payment lifecycle off-chain, signing `ReceiveWithAuthorization` payloads and sending them via `X-PAYMENT` headers to settled targets.
 
 ## **Phase 5: UI & Containerized Deployment (Priority: Low / Stretch Goal) — [COMPLETE]**
 
@@ -65,7 +65,7 @@
 
 * **[COMPLETE] Task 5.1 (The Silver-Blue Dashboard View):** Spin up an HTTP service using `Bun.serve()`. Deliver a single static HTML page utilizing vanilla CSS, responsive heights (perfect viewport fit), distinct columns for average score and total score, registry tooltips on hover, and an interactive developer copy proof drawer.
 * **[COMPLETE] Task 5.2 (Simulated Activity Feed):** Integrate Server-Sent Events (SSE) to stream live discovery, payment routing, reputation recalculations, and slash actions to the dashboard.
-* **[TODO] Task 5.3 (Walrus Backup Worker):** Dump SQLite records to a flat `state_snapshot.json` and upload to the Walrus Protocol publisher API.
+* **[COMPLETE] Task 5.3 (Walrus Backup Worker):** Dump SQLite records to a flat `state_snapshot.json` and upload to the Walrus Protocol publisher API.
 
 ---
 
