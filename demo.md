@@ -15,11 +15,7 @@ Use this document to prepare for hackathon demos, pitches, and technical present
 1. **The Trust Deficit:** In an open web of AI agents, how does Agent A know if Agent B is reliable, accurate, or even online before sending a payment?
 2. **Centralization Bottleneck:** Standard agent frameworks rely on centralized Web2 API keys or directories (like a Yelp for agents) which introduce single-points-of-failure, censorship, and platform fees.
 3. **The Blockchain Trilemma:** Storing full feedback logs on-chain for millions of interactions is too expensive (gas costs) and too slow (latency).
-4. **Sybil Attacks:** Insular groups of bad agents can easily collude, leaving fake positive reviews for one another to manipulate search registries.
-
----
-
-## ⚡ The Solution: `andre8004` Architecture
+4. **Sybil Attacks:** Insular groups of bad agents can easily collude, leaving fake positive reviews for one another to manipulate search registries.## ⚡ The Solution: `andre8004` Architecture
 
 We bridge off-chain analytical speed with on-chain cryptographic security:
 
@@ -29,17 +25,22 @@ We bridge off-chain analytical speed with on-chain cryptographic security:
   * **CCI (Concentrated Co-interaction Index):** Graph-slashing logic that drops scores of agents receiving reviews from a tight, collusive clique of clients.
 * **State Root Merkle Factory:** We compile all active agent scores into a Merkle Tree in **under 60ms** and save proofs. Unrated/zero-feedback agents are ignored entirely, cutting the tree size by 67% and reducing Merkle proofs to **11 elements** (drastically lowering EVM verification gas costs).
 * **On-Chain Oracle Validation:** Chainlink Functions queries our root endpoint and updates the verified root in [andre8004.sol](file:///Users/vadim/Desktop/andre8004/andre8004.sol).
-* **Gasless P2P Settlement:** Client agents verify a target's proof directly on-chain using a read-only call (free), then attach an ERC-3009 signed USDC payment authorization to HTTP headers (`X-PAYMENT`) using Privy server wallets.
+* **Gasless P2P Settlement (Dual-Mode Privy):** Client agents verify a target's proof directly on-chain using a read-only call (free), then attach an ERC-3009 signed USDC payment authorization to HTTP headers (`X-PAYMENT`) using Privy server wallets.
+  * *Production-Ready SDK Setup:* Supports both a local cryptographic mock (`privy-mock.ts`) and the live production `@privy-io/server-auth` SDK (toggled via `USE_REAL_PRIVY=true`). 
+  * *Noble-Hashes Fix:* Upgraded dependencies to `@noble/hashes@2.2.0` to resolve transitive ESM compilation issues on macOS/Bun runtime.
+* **Decentralized Archival Backups:** Periodically uploads flat database state snapshots to Sui's decentralized storage network using the Walrus Protocol publisher API (`/v1/blobs?epochs=1`).
+* **Railway Multi-Process Consolidation:** Formulated a single-container launch sequence (`sh -c "bun bootstrap.ts && bun arc-streamer.ts & bun server.ts"`) to run both the API server and L1 streamer daemon concurrently on Railway, sharing the SQLite cache database natively on the local disk without database volume mismatch issues.
 
 ---
 
 ## ⚖️ Market Uniqueness: Why We Win
 
-| Feature | standard Solutions (Centralized) | Raw Chainlink / Oracles | `andre8004` (Our Hybrid Model) |
+| Feature | Standard Solutions (Centralized) | Raw Chainlink / Oracles | `andre8004` (Our Hybrid Model) |
 | :--- | :--- | :--- | :--- |
 | **Trustless Verification** | **No.** Prone to censorship & single points of failure. | **Yes**, but slow and expensive for bulk calculations. | **Yes.** Cryptographic on-chain proof verification. |
 | **EVM Cost / Latency** | Centralized speed, zero blockchain guarantees. | High gas fees. Querying external APIs on every transaction is slow. | **Sub-micro gas.** Zero gas read-only verification; proofs served in <5ms. |
 | **Sybil Resistance** | Centralized detection (black box). | None. DON nodes cannot process graph analytics. | **CCI Slashing.** Dynamic mathematical penalty against collusive cliques. |
+| **Decentralized Backups** | Ephemeral or centralized S3. | None. | **Walrus Testnet Publisher.** Flat snapshot blobs registered on Sui. |
 
 ---
 
@@ -51,9 +52,12 @@ We bridge off-chain analytical speed with on-chain cryptographic security:
 2. **Explain the 67% Optimization:**
    * Explain how we filter out inactive agents during sync.
    * *Talking Point:* *"Rather than bloating our Merkle tree with 5,800+ zero-score nodes, we filter out zero-feedback agents entirely. This reduced tree size to 1,915 active nodes, shortened proof paths from 13 to 11 elements, and cut EVM validation gas costs."*
-3. **Showcase the Real-Time Activity Feed:**
-   * Watch the logs stream in on the right card.
-   * *Talking Point:* *"This represents the engine actively listening to log events on Circle Arc L1, calculating CCI Sybil penalties, updating our local cache, and broadcasting the state roots."*
+3. **Showcase the Live Event Poller and Railway Setup:**
+   * *Talking Point:* *"Our poller streams live feedback events from Circle Arc L1, updates the SQLite cache, and serves the dashboard. On Railway, this is consolidated into a single lightweight container process, running the analytical DB, event poller, and HTTP API together."*
+4. **Show the Live Walrus Backup Proof:**
+   * *Talking Point:* *"We back up our analytical state to Sui's decentralized Walrus storage network. A flat JSON snapshot of the DB has been successfully archived with Blob ID `s5B5ihZOw1DXkgfN-GIwTRSEtj8vsiiXNDO8h1eGKzw`, ensuring trustless data availability and recovery."*
+5. **Discuss Privy SDK Dual-Mode and Noble-Hashes Resolution:**
+   * *Talking Point:* *"To ensure hackathon eligibility and compatibility, the codebase implements the standard Privy Server-Auth SDK. We resolved a deep transitive ESM dependency bug in noble-hashes (v1.4.0 -> v2.2.0) to compile the real Privy client seamlessly, while supporting a local KMS-backed mock for gasless local simulations."*
 
 ---
 
@@ -87,15 +91,24 @@ We bridge off-chain analytical speed with on-chain cryptographic security:
 * **Content:**
   * **Verification:** Routing client does a free, read-only EVM call to verify the target agent's Merkle proof.
   * **Authorization:** Client's Privy server wallet signs an ERC-3009 `ReceiveWithAuthorization` EIP-712 payload off-chain.
-  * **Settlement:** Target agent receives payload via `X-PAYMENT` HTTP headers, executes the command, and submits settlement on-chain, paying the gas.
+  * **Dual-Mode Flex:** Toggleable dynamic import between the real Privy SDK and local mock. Resolved dependency bugs to enable clean production build compilation.
+  * **Settlement:** Target agent receives payload via `X-PAYMENT` HTTP headers, executes the work, and submits settlement on-chain, paying the gas.
 * **Visuals:** Base64-encoded payload header representation next to Privy and USDC logos.
 
-### Slide 5: Road to Production (Next Steps)
+### Slide 5: Decentralized Archival (Walrus Integration)
+* **Title:** Secure State Storage & Archival Backups
+* **Content:**
+  * **Decentralized Backups:** analytical DB states compiled into flat JSON snapshots and uploaded to the Walrus Testnet publisher.
+  * **Proven Execution:** Live backup registered on-chain with Blob ID `s5B5ihZO...`.
+  * **Disaster Recovery:** Ensures local SQLite cache states can be verified and rebuilt trustlessly from decentralized nodes.
+* **Visuals:** Walrus logo with SUI storage registration details.
+
+### Slide 6: Road to Production (Next Steps)
 * **Title:** Scaling to Mainnet
 * **Content:**
-  * **High Uptime:** Moving poller to AWS ECS/Fargate container daemons.
-  * **AWS KMS:** Replacing local private keys with AWS KMS hardware signing keys.
-  * **Consensus updates:** Live Chainlink Functions subscription registration.
+  * **AWS KMS:** Upgrading `kms-signer.ts` from local dev keys to live AWS KMS HSM (Hardware Security Module) keys for secure transaction signing.
+  * **CRE Migration:** Preparing to migrate from Chainlink Functions to the **Chainlink Runtime Environment (CRE)** to align with Chainlink's platform sunset roadmap.
+  * **Edge Availability:** Cloudflare CDN deployment for sub-10ms global Merkle proof lookups.
 * **Strategic Focus:** Show that you have a clear, mature blueprint for production deployment.
 
 ---
@@ -106,15 +119,15 @@ We bridge off-chain analytical speed with on-chain cryptographic security:
 * **Audio:** *"Welcome to the future of the agentic economy. In a world where millions of AI agents discover, hire, and pay each other, we face a major roadblock: the Agent Trust Dilemma. How does Agent A know if Agent B is reliable, accurate, or even online before sending USDC? Storing feedback loops on-chain is too expensive and slow, and centralized directories compromise Web3 values. Meet `andre8004`."*
 * **Visual:** Slide 1 transitioning into Slide 2.
 
-### [0:30 - 1:15] The Architecture & Core Algorithms
+### [0:30 - 1:20] The Architecture & Core Algorithms
 * **Audio:** *"andre8004 is a high-performance reputation routing and gasless payment engine. It splits the workload. Heavy calculations run off-chain in our SQLite cache database, calculating a Time-Weighted Moving Average to decay historical reviews and a Sybil-slashing Concentrated Co-interaction Index to penalize collusive agent cliques. The cache is compiled into an OpenZeppelin-compatible Merkle Tree in under 60 milliseconds. By filtering out unrated nodes, we optimized the tree size by 67%, reducing proofs to 11 elements for ultra-low gas verification on-chain."*
 * **Visual:** Slide 3 (Architecture) followed by showing the running local Dashboard UI at `http://localhost:3000`. Hover over registries and click "View Proof" to display the JSON proof array.
 
-### [1:15 - 2:30] Live Execution & Testnet Demo
-* **Audio:** *"Our oracle contract is deployed and live on the Circle Arc Testnet. Let's see the execution loop. When a client agent wants to hire a service agent, it queries the Merkle root on-chain to verify the target's score. Once verified, the client's Privy server wallet generates and signs an ERC-3009 gasless USDC payment authorization. The target receives this signed payload in the HTTP X-PAYMENT header, executes the work, and settles on-chain. Here you can see the simulation output executing EIP-712 signing, validating, and submitting state roots on the live testnet in real-time."*
-* **Visual:** Record terminal screens running `bun privy-x402-loop.ts`, `bun test-functions.ts`, and `bun commit-root.ts` showing successful logs and tx receipts.
+### [1:20 - 2:30] Live Execution & Testnet Demo
+* **Audio:** *"Our oracle contract is deployed and live on the Circle Arc Testnet. Let's see the execution loop. When a client agent wants to hire a service agent, it queries the Merkle root on-chain to verify the target's score. Once verified, the client's Privy server wallet generates and signs an ERC-3009 gasless USDC payment authorization. The target receives this signed payload in the HTTP X-PAYMENT header, executes the work, and settles on-chain. Here you can see the simulation output executing EIP-712 signing, validating, and submitting state roots on the live testnet. We also back up our database cache trustlessly to the Walrus decentralized storage network, successfully uploading snapshots to testnet with Blob ID `s5B5ihZO...`."*
+* **Visual:** Record terminal screens running `bun privy-x402-loop.ts`, `bun test-functions.ts`, `bun walrus-backup.ts`, and `bun commit-root.ts` showing successful logs and tx receipts.
 
 ### [2:30 - 3:00] Value Prop & Conclusion
-* **Audio:** *"By combining the speed of local caching, Sybil-slashing analytics, and cryptographic state roots verified via Chainlink Functions, we bridge off-chain analytical velocity with on-chain EVM security. `andre8004` makes agentic transaction routing secure, cheap, and gasless. Thank you."*
-* **Visual:** Slide 5 (Roadmap) with GitHub repository link and contact details.
+* **Audio:** *"By combining the speed of local caching, Sybil-slashing analytics, and cryptographic state roots verified via Chainlink, we bridge off-chain analytical velocity with on-chain EVM security. Our setup is containerized and ready for production, with a clear roadmap to migrate to Chainlink Runtime Environment and AWS KMS. `andre8004` makes agentic transaction routing secure, cheap, and gasless. Thank you."*
+* **Visual:** Slide 6 (Roadmap) with GitHub repository link and contact details.
 
