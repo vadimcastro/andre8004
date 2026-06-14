@@ -167,14 +167,14 @@ Open [http://localhost:3000](http://localhost:3000) in your web browser to view 
 ### 6. Decentralized Database Backup (Walrus Protocol)
 To back up the local SQLite database cache state onto the decentralized Walrus storage network:
 * **Option A: Public Testnet Publisher (Default)**
-  By default, [walrus-backup.ts](file:///Users/vadim/Desktop/andre8004/walrus-backup.ts) is configured to upload directly to the public testnet publisher: `https://publisher.walrus-testnet.walrus.space/store`.
+  By default, [walrus-backup.ts](file:///Users/vadim/Desktop/andre8004/walrus-backup.ts) is configured to upload directly to the public testnet publisher: `https://publisher.walrus-testnet.walrus.space/v1/blobs`.
   Run the backup task:
   ```bash
   bun walrus-backup.ts
   ```
 * **Option B: Local/Private Publisher (Recommended for Production)**
   To run a reliable, private publisher gateway locally (e.g., on port `8080` via Docker):
-  1. Set `WALRUS_PUBLISHER_URL` in [walrus-backup.ts](file:///Users/vadim/Desktop/andre8004/walrus-backup.ts) to your custom publisher endpoint (e.g., `http://localhost:8080/store`).
+  1. Set `WALRUS_PUBLISHER_URL` in [walrus-backup.ts](file:///Users/vadim/Desktop/andre8004/walrus-backup.ts) to your custom publisher endpoint (e.g., `http://localhost:8080/v1/blobs`).
   2. Run the backup worker command as usual.
 
 ---
