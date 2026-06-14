@@ -1,0 +1,21 @@
+{
+  "name": "andre8004",
+  "version": "1.0.0",
+  "description": "ERC-8004 Multi-Chain Reputation Oracle Engine",
+  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "etl": "bun 8004scan-etl.ts",
+    "seed": "bun seed.ts",
+    "stream": "bun arc-streamer.ts",
+    "sync": "bun sync.ts"
+  },
+  "dependencies": {
+    "viem": "^2.21.0",
+    "merkletreejs": "^0.4.0",
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7"
+  }
+}

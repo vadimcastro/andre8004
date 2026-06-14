@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>andre8004 // Agent Trust & Routing Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f0f4f8; /* Soft light cool blue-silver background */
+      --card-bg: rgba(255, 255, 255, 0.88); /* Glassmorphism card bg */
+      --border: rgba(186, 204, 220, 0.5); /* Crisp cool light blue-silver borders */
+      --text: #102a43; /* Rich dark blue text for optimal contrast/readability */
+      --text-muted: #486581; /* Muted cool blue-grey text */
+      --primary: #334e68; /* Slate primary */
+      --primary-glow: rgba(51, 78, 104, 0.04);
+      --secondary: #1982c4; /* Sky blue secondary */
+      --accent: #d90429; /* Slashing red */
+      --success: #06d6a0; /* Settlement green */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      overflow: hidden; /* Prevent page-level scrolling to fit viewport */
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 60%, #bcccdc 100%);
+    }
+
+    header {
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.5);
+      flex-shrink: 0; /* Header doesn't shrink */
+    }
+
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.04em;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .epoch-badge {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .epoch-badge span {
+      color: #334155;
+      font-weight: 700;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.85fr 1.15fr;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      max-width: 100%;
+      width: 100%;
+      margin: 0 auto;
+      min-height: 0; /* Important to enable overflow heights in children */
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 10px 25px -5px rgba(148, 163, 184, 0.1), 0 8px 10px -6px rgba(148, 163, 184, 0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0; /* Enables scrollable containers inside */
+    }
+
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #334155;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+      padding-right: 0.25rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      padding: 0.65rem 0.5rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+      position: sticky;
+      top: 0;
+      background: #ffffff; /* Avoid transparency overlapping issues on scroll */
+      z-index: 1;
+    }
+
+    /* Improved column alignment and readability */
+    th:nth-child(3), td:nth-child(3) { text-align: right; padding-right: 1.5rem; }
+    th:nth-child(4), td:nth-child(4) { text-align: right; padding-right: 1.5rem; }
+    th:nth-child(2), td:nth-child(2) { text-align: center; }
+    th:nth-child(5), td:nth-child(5) { text-align: center; }
+    th:nth-child(6), td:nth-child(6) { text-align: center; }
+
+    .score-badge, .volume-badge {
+      font-variant-numeric: tabular-nums;
+    }
+
+    td {
+      padding: 0.65rem 0.5rem;
+      border-bottom: 1px solid rgba(186, 204, 220, 0.25);
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    tr:hover td {
+      background: rgba(186, 204, 220, 0.35);
+    }
+
+    /* Beautiful custom tooltip for registry address on hover */
+    .agent-guid {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      position: relative;
+      cursor: help;
+    }
+
+    .agent-guid::after {
+      content: "Registry: " attr(data-registry);
+      position: absolute;
+      bottom: 130%;
+      left: 0;
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-family: monospace;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.15s ease-in-out;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 20;
+    }
+
+    .agent-guid:hover::after {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+
+    .chain-pill {
+      font-size: 0.7rem;
+      padding: 0.12rem 0.4rem;
+      border-radius: 5px;
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .chain-5042002 {
+      background: rgba(71, 85, 105, 0.12);
+      color: #334155;
+      border: 1px solid rgba(71, 85, 105, 0.2);
+    }
+
+    .chain-8453 {
+      background: rgba(71, 85, 105, 0.08);
+      color: var(--primary);
+    }
+
+    .score-badge {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .badge-x402 {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #065f46;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.45rem;
+      border-radius: 5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .badge-none {
+      border: 1px solid rgba(186, 204, 220, 0.4);
+      color: #94a3b8;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.45rem;
+      border-radius: 5px;
+      font-weight: 500;
+    }
+
+    .btn {
+      background: var(--primary);
+      border: 1px solid rgba(51, 78, 104, 0.2);
+      color: #ffffff;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .btn:hover {
+      background: #102a43;
+      transform: translateY(-1px);
+    }
+
+    .feed-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+      padding-right: 0.25rem;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .feed-item {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 10px;
+      padding: 0.75rem;
+      font-size: 0.8rem;
+      animation: slideIn 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .feed-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+    }
+
+    .feed-tag {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.02em;
+    }
+
+    .feed-time {
+      color: var(--text-muted);
+    }
+
+    .feed-body {
+      line-height: 1.35;
+      color: #475569;
+    }
+
+    .feed-tx {
+      font-family: monospace;
+      color: var(--text-muted);
+      background: rgba(241, 245, 249, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      word-break: break-all;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 2.25rem;
+      width: 90%;
+      max-width: 640px;
+      position: relative;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      color: var(--text);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.25rem;
+    }
+
+    .modal-close:hover {
+      color: var(--text);
+    }
+
+    .proof-box {
+      background: #f8fafc;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-family: monospace;
+      font-size: 0.75rem;
+      max-height: 160px;
+      overflow-y: auto;
+      color: #334155;
+      margin: 0.6rem 0;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      andre8004
+    </div>
+    <div class="epoch-badge">
+      <div>Active Root: <span id="current-root">0x000...</span></div>
+      <div>Epoch: <span id="current-epoch">1</span></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="card-title">
+        Cached Agent Trust Leaderboard
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Agent GUID</th>
+              <th>Chain</th>
+              <th>Reputation (Avg)</th>
+              <th>Feedback Vol (Total)</th>
+              <th>x402 Capable</th>
+              <th>Verification Proof</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted);">Loading agent cache...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">
+        Real-Time P2P Activity Feed
+      </div>
+      <div class="feed-container" id="activity-feed">
+        <div class="feed-item">
+          <div class="feed-header">
+            <span class="feed-tag" style="color: #64748b;">SYSTEM INIT</span>
+            <span class="feed-time">Just Now</span>
+          </div>
+          <div class="feed-body">
+            Listening for Arc L1 logs, Privy client routing authorizations, and Chainlink Functions consensus events...
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Merkle Modal -->
+  <div class="modal" id="proof-modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h2 class="card-title" style="margin-bottom: 0.8rem; border: none; padding: 0;">Cryptographic Merkle Proof</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem; line-height: 1.4;">
+        This proof verifies the target agent's reputation state directly on-chain within the <code>andre8004.sol</code> smart contract using Chainlink Functions.
+      </p>
+      
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div>
+          <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; margin-bottom: 0.2rem;">Agent GUID</div>
+          <div id="modal-guid" style="font-family: monospace; word-break: break-all; font-weight: 700; font-size: 0.85rem; color: var(--text); background: rgba(186, 204, 220, 0.25); padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid rgba(186, 204, 220, 0.4);"></div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; margin-bottom: 0.2rem;">Wallet Address</div>
+            <div id="modal-address" style="font-family: monospace; color: var(--text); font-size: 0.8rem; word-break: break-all;"></div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; margin-bottom: 0.2rem;">Leaf Hash (Keccak256)</div>
+            <div id="modal-leaf" style="font-family: monospace; color: var(--text); font-size: 0.8rem; word-break: break-all;"></div>
+          </div>
+        </div>
+
+        <div style="margin-top: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600;">Merkle Path Proof (JSON array)</div>
+            <button class="btn" style="padding: 0.2rem 0.6rem; font-size: 0.7rem; background: var(--primary); color: #ffffff;" onclick="copyProofJson(this)">Copy JSON</button>
+          </div>
+          <div class="proof-box" id="modal-proof"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadData() {
+      try {
+        // Fetch current epoch details
+        const rootRes = await fetch('/epoch-root');
+        if (rootRes.ok) {
+          const rootData = await rootRes.json();
+          document.getElementById('current-root').innerText = rootData.root.substring(0, 10) + '...' + rootData.root.substring(rootData.root.length - 8);
+          document.getElementById('current-epoch').innerText = rootData.epochId;
+        }
+
+        // Fetch leaderboard
+        const boardRes = await fetch('/leaderboard');
+        if (boardRes.ok) {
+          const boardData = await boardRes.json();
+          const tbody = document.getElementById('leaderboard-body');
+          tbody.innerHTML = '';
+
+          // Use direct database cache list since zero-score agents are now filtered at database level
+          const activeAgents = boardData;
+
+          if (activeAgents.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No active agents in database cache.</td></tr>`;
+            return;
+          }
+
+          // Take the top 100 active agents for display performance
+          activeAgents.slice(0, 100).forEach(agent => {
+            const tr = document.createElement('tr');
+            
+            const isCapable = agent.x402_capable === 1;
+            const x402Html = isCapable 
+              ? `<span class="badge-x402">x402</span>` 
+              : `<span class="badge-none">No</span>`;
+
+            // Chain name / styling
+            let chainName = 'Ethereum';
+            if (agent.chain_id === 5042002) chainName = 'Arc L1';
+            else if (agent.chain_id === 8453 || agent.chain_id === 84532) chainName = 'Base';
+            
+            tr.innerHTML = `
+              <td>
+                <div class="agent-guid" data-registry="${agent.registry_address}">
+                  ${agent.token_id}
+                  <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal; margin-left: 0.25rem;">(${agent.registry_address.substring(0,6)}...)</span>
+                </div>
+              </td>
+              <td>
+                <span class="chain-pill chain-${agent.chain_id}">${chainName}</span>
+              </td>
+              <td>
+                <span class="score-badge">${agent.average_score.toFixed(2)}</span>
+              </td>
+              <td>
+                <span class="volume-badge" style="font-weight: 600; color: var(--text-muted);">${Math.round(agent.total_score)}</span>
+              </td>
+              <td>
+                ${x402Html}
+              </td>
+              <td>
+                <button class="btn" onclick="openProof('${agent.agent_guid}')">View Proof</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (err) {
+        console.error("Error loading dashboard data:", err);
+      }
+    }
+
+    async function openProof(guid) {
+      try {
+        const res = await fetch(`/agents/${encodeURIComponent(guid)}/proof`);
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('modal-guid').innerText = data.agent_guid;
+          document.getElementById('modal-address').innerText = data.wallet_address;
+          document.getElementById('modal-leaf').innerText = data.leaf;
+          document.getElementById('modal-proof').innerText = JSON.stringify(data.proof, null, 2);
+          
+          document.getElementById('proof-modal').style.display = 'flex';
+        }
+      } catch (e) {
+        console.error("Error opening proof:", e);
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('proof-modal').style.display = 'none';
+    }
+
+    function copyProofJson(btn) {
+      const proofText = document.getElementById('modal-proof').innerText;
+      navigator.clipboard.writeText(proofText);
+      const originalText = btn.innerText;
+      btn.innerText = 'Copied!';
+      btn.style.background = 'var(--success)';
+      setTimeout(() => {
+        btn.innerText = originalText;
+        btn.style.background = '';
+      }, 1500);
+    }
+
+    // Set up SSE Client for Real-time feed (Phase 5.1)
+    const eventSource = new EventSource('/stream');
+    eventSource.onmessage = function(event) {
+      const feed = document.getElementById('activity-feed');
+      const data = JSON.parse(event.data);
+
+      const item = document.createElement('div');
+      item.className = 'feed-item';
+
+      let tagColor = '#64748b'; // default steel grey
+      if (data.type.includes('PAYMENT')) tagColor = 'var(--success)';
+      if (data.type.includes('MONITORING')) tagColor = 'var(--accent)';
+      if (data.type.includes('DISCOVERY')) tagColor = 'var(--primary)';
+      if (data.type.includes('ORACLE')) tagColor = 'var(--secondary)';
+
+      item.innerHTML = `
+        <div class="feed-header">
+          <span class="feed-tag" style="color: ${tagColor};">${data.type}</span>
+          <span class="feed-time">Just Now</span>
+        </div>
+        <div class="feed-body">${data.message}</div>
+        ${data.txHash ? `<div class="feed-tx">Tx: ${data.txHash}</div>` : ''}
+      `;
+
+      feed.insertBefore(item, feed.firstChild);
+
+      // Keep only top 20 items in feed list
+      if (feed.children.length > 20) {
+        feed.removeChild(feed.lastChild);
+      }
+
+      // Reload leaderboard if cache updated
+      if (data.type.includes('SYNC')) {
+        loadData();
+      }
+    };
+
+    // Initial load
+    loadData();
+  </script>
+</body>
+</html>
