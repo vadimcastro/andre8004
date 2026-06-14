@@ -131,3 +131,66 @@ We bridge off-chain analytical speed with on-chain cryptographic security:
 * **Audio:** *"By combining the speed of local caching, Sybil-slashing analytics, and cryptographic state roots verified via Chainlink, we bridge off-chain analytical velocity with on-chain EVM security. Our setup is containerized and ready for production, with a clear roadmap to migrate to Chainlink Runtime Environment and AWS KMS. `andre8004` makes agentic transaction routing secure, cheap, and gasless. Thank you."*
 * **Visual:** Slide 6 (Roadmap) with GitHub repository link and contact details.
 
+---
+
+## 💻 Quick Demo Command Checklist (For Video Recording)
+
+Run these terminal commands sequentially during your presentation to demonstrate the complete lifecycle of the trust and routing engine:
+
+### 1. Database Bootstrapping & Seeding
+Prepare the analytical cache database with real ERC-8004 feedback event streams:
+```bash
+bun bootstrap.ts
+```
+*(Demonstrates schema creation, raw feedback seeding, and first-run scoring calculations).*
+
+### 2. Synchronization & Slashing Score Calculation
+Recalculate reputation scores using Time-Weighted Moving Average (TWMA) decay and Concentrated Co-interaction Index (CCI) clique-penalization:
+```bash
+bun sync.ts
+```
+*(Demonstrates off-chain scoring analytics and the 67% optimization of filtering out inactive nodes).*
+
+### 3. Merkle Tree Proof Generation
+Compile active scores into the OpenZeppelin-compatible sorted Merkle Tree:
+```bash
+bun merkle.ts
+```
+*(Demonstrates tree compilation in <60ms and proof path serialization).*
+
+### 4. Smart Contract Local Proof Verification
+Verify generated Merkle proofs against the derived roots locally using EVM rules:
+```bash
+bun test-oracle.ts
+```
+*(Demonstrates contract compatibility and verification checks for valid/invalid/tampered proofs).*
+
+### 5. Privy EIP-712 & ERC-3009 Gasless Payments
+Execute the complete trust-and-payment loop utilizing programmatically managed agent wallets:
+```bash
+bun privy-x402-loop.ts
+```
+*(Demonstrates on-chain proof lookup, Privy server-wallet signature generation, and ERC-3009 ReceiveWithAuthorization header transmission).*
+
+### 6. Decentralized Archival (Walrus Storage)
+Publish database states and scoring snapshots to Sui's decentralized storage network:
+```bash
+bun walrus-backup.ts
+```
+*(Demonstrates storage registration and logging of Blob IDs in the history table).*
+
+### 7. Chainlink Functions Sandbox Simulation
+Simulate decentralized oracle consensus queries inside the sandboxed DON environment:
+```bash
+bun test-functions.ts
+```
+*(Demonstrates fetching the API roots and updating on-chain mappings).*
+
+### 8. Exposing API Server & Dashboard UI
+Start the local HTTP server and Server-Sent Event (SSE) stream logs:
+```bash
+bun server.ts
+```
+*(Now open http://localhost:3000 in your browser to showcase the silver-blue glassmorphism dashboard, copy Merkle proofs, and watch live event logs stream in).*
+
+
